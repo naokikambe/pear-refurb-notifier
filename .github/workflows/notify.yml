@@ -1,0 +1,36 @@
+name: Email Notifier
+
+on:
+  repository_dispatch:
+    types: [notify]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: email-notifier
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Send notification
+        env:
+          PAYLOAD_ENCRYPTION_KEY: ${{ secrets.PAYLOAD_ENCRYPTION_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: python notify.py
