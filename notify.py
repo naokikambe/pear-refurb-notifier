@@ -53,10 +53,11 @@ def render_email(payload: dict[str, Any]) -> tuple[str, str]:
         lines.append(f"Detected at: {detected_at}")
 
     for target in payload.get("targets", []):
+        source = target.get("source_label") or target.get("source_id", "")
         lines.extend(
             [
                 "",
-                f"Source: {target.get('source_id', '')}",
+                f"Source: {source}",
                 f"Mode: {target.get('mode', '')}",
                 f"Counts: {json.dumps(target.get('counts', {}), sort_keys=True)}",
                 f"Included: {target.get('included_count', 0)} / {target.get('total_count', 0)}",
