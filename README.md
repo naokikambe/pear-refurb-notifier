@@ -22,7 +22,8 @@ MAIL_TO
 ```
 
 `PAYLOAD_ENCRYPTION_KEY` must match the value configured in the watcher repository.
-`MAIL_PROVIDER` selects the mail delivery provider. `MAIL_API_KEY` is the API key for the configured mail provider.
+`MAIL_PROVIDER` is reserved for future mail backend selection. Currently it is informational only.
+`MAIL_API_KEY` is the API key used by the current mail delivery backend.
 
 Generate a Fernet key with:
 
@@ -50,13 +51,13 @@ The plaintext payload exists only in memory after decryption. It is not logged.
 
 ## Email Delivery
 
-Email is sent through the configured mail provider. `MAIL_FROM` must be usable by that provider account. A verified sending domain is recommended for stable operation.
+Email is sent through the current mail delivery backend. `MAIL_FROM` must be usable by that backend account. A verified sending domain is recommended for stable operation.
 
-Provider quota, rate limits, API key validity, and domain verification status can cause send failures. If sending fails, the workflow fails.
+Backend quota, rate limits, API key validity, and domain verification status can cause send failures. If sending fails, the workflow fails.
 
-The decrypted `event_id` is sent as a provider idempotency key when the selected provider supports it, reducing duplicate sends during retries or manual reruns.
+The decrypted `event_id` is sent as an idempotency key to reduce duplicate sends during retries or manual reruns.
 
-On provider errors, the workflow logs only a generic error and HTTP status code. It does not log recipients, message body, subject content, or provider response body.
+On backend errors, the workflow logs only a generic error and HTTP status code. It does not log recipients, message body, subject content, or backend response body.
 
 ## Public Repository Rules
 

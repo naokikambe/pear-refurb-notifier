@@ -75,7 +75,7 @@ def render_email(payload: dict[str, Any]) -> tuple[str, str]:
     return subject, "\n".join(lines).strip() + "\n"
 
 
-def send_via_resend(subject: str, text: str, event_id: str) -> None:
+def send_email(subject: str, text: str, event_id: str) -> None:
     response = requests.post(
         "https://api.resend.com/emails",
         headers={
@@ -95,14 +95,6 @@ def send_via_resend(subject: str, text: str, event_id: str) -> None:
         response.raise_for_status()
     except requests.RequestException:
         raise NotifyError(f"Failed to send email: status={response.status_code}") from None
-
-
-def send_email(subject: str, text: str, event_id: str) -> None:
-    provider = env_required("MAIL_PROVIDER")
-    if provider == "resend":
-        send_via_resend(subject, text, event_id)
-        return
-    raise NotifyError(f"Unsupported mail provider: {provider}")
 
 
 def main() -> None:
