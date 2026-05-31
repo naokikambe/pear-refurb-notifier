@@ -33,6 +33,10 @@ python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().d
 
 Do not commit keys, email addresses, API keys, or real notification examples.
 
+Security note: Do not enable GitHub Actions debug logging in public repositories when using this project.
+
+Avoid setting `ACTIONS_RUNNER_DEBUG` or `ACTIONS_STEP_DEBUG` to `true`, because debug logs may include additional execution details. This project intentionally avoids logging decrypted payloads, notification bodies, URLs, credentials, and recipient information.
+
 ## Dispatch Payload
 
 The notifier expects `repository_dispatch` events with encrypted payload only. It is intentionally not manually runnable through `workflow_dispatch`.
