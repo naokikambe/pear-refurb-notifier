@@ -17,6 +17,7 @@ Configure these GitHub Secrets:
 PAYLOAD_ENCRYPTION_KEY
 MAIL_PROVIDER
 MAIL_API_KEY
+MAIL_API_ENDPOINT
 MAIL_FROM
 MAIL_TO
 ```
@@ -24,6 +25,7 @@ MAIL_TO
 `PAYLOAD_ENCRYPTION_KEY` must match the value configured in the watcher repository.
 `MAIL_PROVIDER` is reserved for future mail backend selection. Currently it is informational only.
 `MAIL_API_KEY` is the API key used by the current mail delivery backend.
+`MAIL_API_ENDPOINT` is the HTTP endpoint for the configured mail delivery backend.
 
 Generate a Fernet key with:
 
@@ -55,7 +57,7 @@ The plaintext payload exists only in memory after decryption. It is not logged.
 
 ## Email Delivery
 
-Email is sent through the current mail delivery backend. `MAIL_FROM` must be usable by that backend account. A verified sending domain is recommended for stable operation.
+Email is sent through the configured mail delivery endpoint. `MAIL_FROM` must be usable by that backend account. A verified sending domain is recommended for stable operation.
 
 Backend quota, rate limits, API key validity, and domain verification status can cause send failures. If sending fails, the workflow fails.
 

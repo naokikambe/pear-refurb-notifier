@@ -134,8 +134,9 @@ def render_email(payload: dict[str, Any]) -> tuple[str, str]:
 
 
 def send_email(subject: str, text: str, event_id: str) -> None:
+    mail_api_endpoint = env_required("MAIL_API_ENDPOINT")
     response = requests.post(
-        "https://api.resend.com/emails",
+        mail_api_endpoint,
         headers={
             "Authorization": f"Bearer {env_required('MAIL_API_KEY')}",
             "Content-Type": "application/json",
