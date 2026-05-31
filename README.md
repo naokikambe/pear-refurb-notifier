@@ -63,6 +63,10 @@ The decrypted `event_id` is sent as an idempotency key to reduce duplicate sends
 
 On backend errors, the workflow logs only a generic error and HTTP status code. It does not log recipients, message body, subject content, or backend response body.
 
+## Notification Display
+
+Targets can include optional `notification_sort_rules` in the encrypted payload. The notifier uses those rules only for display ordering of item details. Rules are evaluated against item titles in order; unmatched items are shown last under `Other`. Source-specific keywords belong in `MONITOR_TARGETS`, not in this public repository.
+
 ## Public Repository Rules
 
 Do not commit:

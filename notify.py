@@ -65,6 +65,37 @@ def render_summary(targets: list[dict[str, Any]]) -> list[str]:
     return lines
 
 
+def matching_rule_label(item: dict[str, Any], rules: list[dict[str, Any]]) -> str | None:
+    title = str(item.get("title", ""))
+    for rule in rules:
+        if any(keyword in title for keyword in rule.get("match", [])):
+            return str(rule.get("label", ""))
+    return None
+
+
+def grouped_items(target: dict[str, Any]) -> list[tuple[str, list[dict[str, Any]]]]:
+    items = target.get("items", [])
+    rules = target.get("notification_sort_rules", [])
+    if not rules:
+        return [("", items)]
+
+    groups: list[tuple[str, list[dict[str, Any]]]] = [(str(rule.get("label", "")), []) for rule in rules]
+    group_by_label = {label: group_items for label, group_items in groups}
+    other: list[dict[str, Any]] = []
+
+    for item in items:
+        label = matching_rule_label(item, rules)
+        if label and label in group_by_label:
+            group_by_label[label].append(item)
+        else:
+            other.append(item)
+
+    result = [(label, group_items) for label, group_items in groups if group_items]
+    if other:
+        result.append(("Other", other))
+    return result
+
+
 def render_email(payload: dict[str, Any]) -> tuple[str, str]:
     targets = payload.get("targets", [])
     target_count = len(targets)
@@ -87,12 +118,17 @@ def render_email(payload: dict[str, Any]) -> tuple[str, str]:
         )
         if target.get("truncated"):
             lines.append("Some item details were omitted because the notification was truncated.")
-        for index, item in enumerate(target.get("items", []), start=1):
-            lines.append("")
-            lines.append(f"Item {index}:")
-            for key in ("change", "title", "spec", "price", "url"):
-                if item.get(key):
-                    lines.append(f"- {key}: {item[key]}")
+        index = 1
+        for group_label, items in grouped_items(target):
+            if group_label:
+                lines.extend(["", f"=== {group_label} ==="])
+            for item in items:
+                lines.append("")
+                lines.append(f"Item {index}:")
+                for key in ("change", "title", "spec", "price", "url"):
+                    if item.get(key):
+                        lines.append(f"- {key}: {item[key]}")
+                index += 1
 
     return subject, "\n".join(lines).strip() + "\n"
 
