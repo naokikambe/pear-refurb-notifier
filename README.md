@@ -15,12 +15,14 @@ Configure these GitHub Secrets:
 
 ```text
 PAYLOAD_ENCRYPTION_KEY
-RESEND_API_KEY
+MAIL_PROVIDER
+MAIL_API_KEY
 MAIL_FROM
 MAIL_TO
 ```
 
 `PAYLOAD_ENCRYPTION_KEY` must match the value configured in the watcher repository.
+`MAIL_PROVIDER` selects the mail delivery provider. `MAIL_API_KEY` is the API key for the configured mail provider.
 
 Generate a Fernet key with:
 
@@ -48,13 +50,13 @@ The plaintext payload exists only in memory after decryption. It is not logged.
 
 ## Email Delivery
 
-Email is sent through the Resend API. `MAIL_FROM` must be usable by the configured Resend account. A verified sending domain is recommended for stable operation.
+Email is sent through the configured mail provider. `MAIL_FROM` must be usable by that provider account. A verified sending domain is recommended for stable operation.
 
-Resend quota, rate limits, API key validity, and domain verification status can cause send failures. If sending fails, the workflow fails.
+Provider quota, rate limits, API key validity, and domain verification status can cause send failures. If sending fails, the workflow fails.
 
-The decrypted `event_id` is sent as the Resend `Idempotency-Key` to reduce duplicate sends during retries or manual reruns.
+The decrypted `event_id` is sent as a provider idempotency key when the selected provider supports it, reducing duplicate sends during retries or manual reruns.
 
-On Resend errors, the workflow logs only a generic error and HTTP status code. It does not log recipients, message body, subject content, or Resend response body.
+On provider errors, the workflow logs only a generic error and HTTP status code. It does not log recipients, message body, subject content, or provider response body.
 
 ## Public Repository Rules
 

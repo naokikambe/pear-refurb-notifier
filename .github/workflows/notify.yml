@@ -30,7 +30,8 @@ jobs:
       - name: Send notification
         env:
           PAYLOAD_ENCRYPTION_KEY: ${{ secrets.PAYLOAD_ENCRYPTION_KEY }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          MAIL_PROVIDER: ${{ secrets.MAIL_PROVIDER }}
+          MAIL_API_KEY: ${{ secrets.MAIL_API_KEY }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
         run: python notify.py
