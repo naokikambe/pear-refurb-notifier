@@ -43,21 +43,43 @@ def load_event_payload() -> dict[str, Any]:
     return decrypt_payload(client_payload["ciphertext"])
 
 
+def source_name(target: dict[str, Any]) -> str:
+    return str(target.get("source_label") or target.get("source_id", ""))
+
+
+def render_summary(targets: list[dict[str, Any]]) -> list[str]:
+    lines = ["=== Summary ===", ""]
+    for target in targets:
+        counts = target.get("counts", {})
+        lines.extend(
+            [
+                source_name(target),
+                f"  added: {counts.get('added', 0)}",
+                f"  changed: {counts.get('changed', 0)}",
+                f"  removed: {counts.get('removed', 0)}",
+                f"  included: {target.get('included_count', 0)} / {target.get('total_count', 0)}",
+                "",
+            ]
+        )
+    lines.append("=================")
+    return lines
+
+
 def render_email(payload: dict[str, Any]) -> tuple[str, str]:
-    target_count = len(payload.get("targets", []))
+    targets = payload.get("targets", [])
+    target_count = len(targets)
     subject = f"Monitor update for {target_count} target(s)"
-    lines = ["A monitored source changed.", "", f"Event ID: {payload.get('event_id', '')}"]
+    lines = [*render_summary(targets), "", "=== Details ===", "", "A monitored source changed.", "", f"Event ID: {payload.get('event_id', '')}"]
 
     detected_at = payload.get("detected_at")
     if detected_at:
         lines.append(f"Detected at: {detected_at}")
 
-    for target in payload.get("targets", []):
-        source = target.get("source_label") or target.get("source_id", "")
+    for target in targets:
         lines.extend(
             [
                 "",
-                f"Source: {source}",
+                f"Source: {source_name(target)}",
                 f"Mode: {target.get('mode', '')}",
                 f"Counts: {json.dumps(target.get('counts', {}), sort_keys=True)}",
                 f"Included: {target.get('included_count', 0)} / {target.get('total_count', 0)}",
